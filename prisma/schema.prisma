@@ -1,0 +1,138 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  role      String   // ADMIN, FACULTY, STUDENT
+  name      String
+  phone     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  studentProfile StudentProfile?
+  facultyProfile FacultyProfile?
+}
+
+model StudentProfile {
+  id          String   @id @default(uuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  department  String?
+  gpa         Float?
+  resumeUrl   String?
+  isActive    Boolean  @default(true)
+  
+  applications Application[]
+  evaluations  Evaluation[]
+  feedbacks    Feedback[]
+}
+
+model FacultyProfile {
+  id          String   @id @default(uuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  department  String?
+  
+  internships Internship[]
+}
+
+model Company {
+  id                 String   @id @default(uuid())
+  name               String
+  registrationNumber String   @unique
+  location           String
+  contactPerson      String
+  contactEmail       String?
+  contactPhone       String?
+  isActive           Boolean  @default(true)
+  
+  internships        Internship[]
+}
+
+model Internship {
+  id                 String   @id @default(uuid())
+  title              String
+  description        String
+  domain             String
+  duration           Int      // In weeks
+  stipend            Float
+  startDate          DateTime
+  endDate            DateTime
+  applicationDeadline DateTime
+  status             String   @default("PENDING") // PENDING, OPEN, REJECTED, CLOSED, ARCHIVED
+  
+  companyId          String
+  company            Company  @relation(fields: [companyId], references: [id])
+  
+  facultyId          String
+  faculty            FacultyProfile @relation(fields: [facultyId], references: [id])
+
+  applications       Application[]
+  evaluations        Evaluation[]
+}
+
+model Application {
+  id              String   @id @default(uuid())
+  studentId       String
+  student         StudentProfile @relation(fields: [studentId], references: [id])
+  
+  internshipId    String
+  internship      Internship @relation(fields: [internshipId], references: [id])
+  
+  resumeUrl       String
+  coverLetter     String?
+  qualifications  String?
+  status          String   @default("pending") // pending, shortlisted, rejected, accepted, withdrawn
+  feedback        String?
+  
+  interviews      Interview[]
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([studentId, internshipId])
+}
+
+model Interview {
+  id                 String   @id @default(uuid())
+  applicationId      String
+  application        Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  
+  date               DateTime
+  time               String
+  interviewerDetails String
+  results            String?
+  feedback           String?
+  status             String   @default("SCHEDULED") // SCHEDULED, COMPLETED, CANCELLED
+}
+
+model Evaluation {
+  id             String   @id @default(uuid())
+  studentId      String
+  student        StudentProfile @relation(fields: [studentId], references: [id])
+  
+  internshipId   String
+  internship     Internship @relation(fields: [internshipId], references: [id])
+  
+  criteria       String
+  scoring        Float
+  feedback       String?
+}
+
+model Feedback {
+  id          String   @id @default(uuid())
+  studentId   String?
+  student     StudentProfile? @relation(fields: [studentId], references: [id])
+  type        String   // STUDENT_ON_COMPANY, COMPANY_ON_STUDENT, FACULTY_ON_INTERNSHIP, SYSTEM
+  rating      Int?     // 1 to 5
+  comments    String
+  createdAt   DateTime @default(now())
+}
