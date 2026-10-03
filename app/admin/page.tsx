@@ -6,6 +6,7 @@ export default function AdminDashboardPage() {
   const [users, setUsers] = useState<any[]>([]);
   const [internships, setInternships] = useState<any[]>([]);
   const [feedbacks, setFeedbacks] = useState<any[]>([]);
+  const [companies, setCompanies] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
 
@@ -16,15 +17,22 @@ export default function AdminDashboardPage() {
   // Edit user
   const [editingUser, setEditingUser] = useState<any>(null);
 
+  // Company management
+  const [showCreateCompany, setShowCreateCompany] = useState(false);
+  const [newCompany, setNewCompany] = useState({ name: '', registrationNumber: '', location: '', contactPerson: '', contactEmail: '', contactPhone: '' });
+  const [editingCompany, setEditingCompany] = useState<any>(null);
+
   useEffect(() => {
     Promise.all([
       fetch('/api/admin/reports').then(r => r.json()),
       fetch('/api/admin/users').then(r => r.json()),
       fetch('/api/admin/internships').then(r => r.json()),
-    ]).then(([reportsData, usersData, internshipsData]) => {
+      fetch('/api/companies').then(r => r.json()),
+    ]).then(([reportsData, usersData, internshipsData, companiesData]) => {
       if (!reportsData.error) setReports(reportsData);
       if (Array.isArray(usersData)) setUsers(usersData);
       if (Array.isArray(internshipsData)) setInternships(internshipsData);
+      if (Array.isArray(companiesData)) setCompanies(companiesData);
       setLoading(false);
     }).catch(() => setLoading(false));
   }, []);
@@ -72,6 +80,49 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const createCompany = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const res = await fetch('/api/companies', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newCompany)
+    });
+    const data = await res.json();
+    if (res.ok) {
+      alert('Company created!');
+      setShowCreateCompany(false);
+      setNewCompany({ name: '', registrationNumber: '', location: '', contactPerson: '', contactEmail: '', contactPhone: '' });
+      setCompanies(prev => [...prev, { ...data, internships: [] }]);
+    } else {
+      alert(data.error);
+    }
+  };
+
+  const editCompany = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const res = await fetch('/api/companies/' + editingCompany.id, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(editingCompany)
+    });
+    const data = await res.json();
+    if (res.ok) {
+      alert('Company updated!');
+      setCompanies(prev => prev.map(c => c.id === data.id ? { ...c, ...data } : c));
+      setEditingCompany(null);
+    } else {
+      alert(data.error);
+    }
+  };
+
+  const archiveCompany = async (companyId: string) => {
+    if (!confirm('Archive this company? It will be hidden from the system.')) return;
+    const res = await fetch('/api/companies/' + companyId, { method: 'DELETE' });
+    if (res.ok) {
+      setCompanies(prev => prev.filter(c => c.id !== companyId));
+    } else {
+      alert('Failed to archive company');
+    }
+  };
+
   const updateInternshipStatus = async (internshipId: string, status: string) => {
     const res = await fetch('/api/admin/internships', {
       method: 'PUT', headers: { 'Content-Type': 'application/json' },
@@ -106,6 +157,7 @@ export default function AdminDashboardPage() {
     { id: 'overview', label: 'Overview' },
     { id: 'users', label: 'Users' },
     { id: 'internships', label: 'Internships' },
+    { id: 'companies', label: 'Companies' },
     { id: 'compliance', label: 'Compliance' },
   ];
 
@@ -349,6 +401,89 @@ export default function AdminDashboardPage() {
                 ))}
               </tbody>
             </table>
+          </div>
+        </div>
+      )}
+
+      {/* ============ COMPANIES TAB ============ */}
+      {activeTab === 'companies' && (
+        <div>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
+            <button onClick={() => setShowCreateCompany(!showCreateCompany)} className="btn btn-primary">
+              {showCreateCompany ? 'Cancel' : '+ Create Company'}
+            </button>
+          </div>
+
+          {showCreateCompany && (
+            <div className="card" style={{ marginBottom: '1.5rem', padding: '1.5rem' }}>
+              <h3 style={{ margin: '0 0 1rem 0' }}>Add New Company</h3>
+              <form onSubmit={createCompany} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                <div className="input-group"><label className="input-label">Company Name</label><input className="input-field" value={newCompany.name} onChange={e => setNewCompany({...newCompany, name: e.target.value})} required /></div>
+                <div className="input-group"><label className="input-label">Registration Number</label><input className="input-field" value={newCompany.registrationNumber} onChange={e => setNewCompany({...newCompany, registrationNumber: e.target.value})} required /></div>
+                <div className="input-group"><label className="input-label">Location</label><input className="input-field" value={newCompany.location} onChange={e => setNewCompany({...newCompany, location: e.target.value})} required /></div>
+                <div className="input-group"><label className="input-label">Contact Person</label><input className="input-field" value={newCompany.contactPerson} onChange={e => setNewCompany({...newCompany, contactPerson: e.target.value})} required /></div>
+                <div className="input-group"><label className="input-label">Contact Email</label><input type="email" className="input-field" value={newCompany.contactEmail} onChange={e => setNewCompany({...newCompany, contactEmail: e.target.value})} /></div>
+                <div className="input-group"><label className="input-label">Contact Phone</label><input className="input-field" value={newCompany.contactPhone} onChange={e => setNewCompany({...newCompany, contactPhone: e.target.value})} /></div>
+                <button type="submit" className="btn btn-primary" style={{ gridColumn: '1 / -1' }}>Create Company</button>
+              </form>
+            </div>
+          )}
+
+          {editingCompany && (
+            <div className="card" style={{ marginBottom: '1.5rem', padding: '1.5rem' }}>
+              <h3 style={{ margin: '0 0 1rem 0' }}>Edit Company: {editingCompany.name}</h3>
+              <form onSubmit={editCompany} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                <div className="input-group"><label className="input-label">Company Name</label><input className="input-field" value={editingCompany.name} onChange={e => setEditingCompany({...editingCompany, name: e.target.value})} /></div>
+                <div className="input-group"><label className="input-label">Registration Number</label><input className="input-field" value={editingCompany.registrationNumber} onChange={e => setEditingCompany({...editingCompany, registrationNumber: e.target.value})} /></div>
+                <div className="input-group"><label className="input-label">Location</label><input className="input-field" value={editingCompany.location} onChange={e => setEditingCompany({...editingCompany, location: e.target.value})} /></div>
+                <div className="input-group"><label className="input-label">Contact Person</label><input className="input-field" value={editingCompany.contactPerson} onChange={e => setEditingCompany({...editingCompany, contactPerson: e.target.value})} /></div>
+                <div className="input-group"><label className="input-label">Contact Email</label><input type="email" className="input-field" value={editingCompany.contactEmail || ''} onChange={e => setEditingCompany({...editingCompany, contactEmail: e.target.value})} /></div>
+                <div className="input-group"><label className="input-label">Contact Phone</label><input className="input-field" value={editingCompany.contactPhone || ''} onChange={e => setEditingCompany({...editingCompany, contactPhone: e.target.value})} /></div>
+                <div style={{ gridColumn: '1 / -1', display: 'flex', gap: '0.75rem' }}>
+                  <button type="submit" className="btn btn-primary" style={{ flex: 1 }}>Save Changes</button>
+                  <button type="button" onClick={() => setEditingCompany(null)} className="btn btn-outline" style={{ flex: 1 }}>Cancel</button>
+                </div>
+              </form>
+            </div>
+          )}
+
+          <div className="card" style={{ overflow: 'hidden', padding: 0 }}>
+            <div style={{ overflowX: 'auto' }}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Reg. No.</th>
+                    <th>Location</th>
+                    <th>Contact Person</th>
+                    <th>Internships</th>
+                    <th>Rating</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {companies.map(c => (
+                    <tr key={c.id}>
+                      <td style={{ fontWeight: 500 }}>{c.name}</td>
+                      <td style={{ color: 'var(--text-muted)' }}>{c.registrationNumber}</td>
+                      <td style={{ color: 'var(--text-muted)' }}>{c.location}</td>
+                      <td style={{ color: 'var(--text-muted)' }}>{c.contactPerson}</td>
+                      <td>{c.internships?.length || 0}</td>
+                      <td>{c.rating != null ? `⭐ ${c.rating.toFixed(1)} (${c.ratingCount})` : '—'}</td>
+                      <td>
+                        <div style={{ display: 'flex', gap: '0.4rem' }}>
+                          <button onClick={() => setEditingCompany(c)} className="btn btn-outline" style={{ padding: '0.25rem 0.5rem', fontSize: '0.78rem' }}>Edit</button>
+                          <button onClick={() => archiveCompany(c.id)} className="btn btn-outline" style={{ padding: '0.25rem 0.5rem', fontSize: '0.78rem', borderColor: 'var(--danger)', color: 'var(--danger)' }}>Archive</button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                  {companies.length === 0 && (
+                    <tr><td colSpan={7} style={{ textAlign: 'center', color: 'var(--text-muted)' }}>No companies yet.</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       )}

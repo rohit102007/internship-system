@@ -54,8 +54,7 @@ function RegisterForm() {
 
   const roles = [
     { key: 'student', label: 'Student', icon: '🎓' },
-    { key: 'faculty', label: 'Faculty', icon: '📋' },
-    { key: 'company', label: 'Company', icon: '🏛️' }
+    { key: 'faculty', label: 'Faculty', icon: '📋' }
   ];
 
   return (
