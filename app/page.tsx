@@ -47,8 +47,8 @@ export default function Home() {
           <Link href="/register?role=student" className="btn btn-primary" style={{ padding: '0.75rem 1.75rem', fontSize: '1rem' }}>
             Get Started as Student
           </Link>
-          <Link href="/register?role=company" className="btn btn-outline" style={{ padding: '0.75rem 1.75rem', fontSize: '1rem' }}>
-            Register as Company
+          <Link href="/register?role=faculty" className="btn btn-outline" style={{ padding: '0.75rem 1.75rem', fontSize: '1rem' }}>
+            Register as Faculty
           </Link>
         </div>
       </section>
