@@ -63,23 +63,6 @@ export default async function RootLayout({
               InternConnect
             </Link>
             <div style={{ display: 'flex', gap: '0.25rem', alignItems: 'center' }}>
-              <Link href="/internships" style={{
-                color: 'var(--text-muted)',
-                padding: '0.45rem 0.85rem',
-                borderRadius: 'var(--radius-sm)',
-                fontSize: '0.9rem',
-                fontWeight: 500,
-                transition: 'all 0.15s ease'
-              }}>Internships</Link>
-              <Link href="/companies" style={{
-                color: 'var(--text-muted)',
-                padding: '0.45rem 0.85rem',
-                borderRadius: 'var(--radius-sm)',
-                fontSize: '0.9rem',
-                fontWeight: 500,
-                transition: 'all 0.15s ease'
-              }}>Companies</Link>
-
               {token ? (
                 <>
                   <Link href="/dashboard" style={{
