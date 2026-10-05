@@ -130,6 +130,13 @@ model Evaluation {
   feedback       String?
 }
 
+model Resume {
+  id        String   @id @default(uuid())
+  fileName  String
+  data      Bytes
+  createdAt DateTime @default(now())
+}
+
 model Feedback {
   id          String   @id @default(uuid())
   studentId   String?

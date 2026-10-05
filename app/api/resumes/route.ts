@@ -36,11 +36,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Resume must be no larger than 5 MB' }, { status: 400 });
     }
 
-    const uploadsDirectory = path.join(process.cwd(), 'public', 'uploads', 'resumes');
-    await mkdir(uploadsDirectory, { recursive: true });
     const fileName = `${user.id}-${randomUUID()}.pdf`;
-    await writeFile(path.join(uploadsDirectory, fileName), Buffer.from(await file.arrayBuffer()));
-    return NextResponse.json({ resumeUrl: `/uploads/resumes/${fileName}` }, { status: 201 });
+    const resume = await prisma.resume.create({ data: { fileName, data: Buffer.from(await file.arrayBuffer()) } });
+    return NextResponse.json({ resumeUrl: `/api/resumes/${resume.id}` }, { status: 201 });
   } catch (error) {
     console.error('Resume upload error:', error);
     return NextResponse.json({ error: 'Unable to upload resume' }, { status: 500 });
@@ -56,7 +54,9 @@ export async function DELETE() {
     const resumeUrl = profile.resumeUrl;
     await prisma.studentProfile.update({ where: { userId: user.id }, data: { resumeUrl: null } });
     const usedInApplication = await prisma.application.count({ where: { studentId: profile.id, resumeUrl } });
-    if (usedInApplication === 0 && resumeUrl.startsWith('/uploads/resumes/')) {
+    if (usedInApplication === 0 && resumeUrl.startsWith('/api/resumes/')) {
+      try { await prisma.resume.delete({ where: { id: resumeUrl.split('/').pop() } }); } catch { /* already removed */ }
+    } else if (usedInApplication === 0 && resumeUrl.startsWith('/uploads/resumes/')) {
       try { await unlink(path.join(process.cwd(), 'public', 'uploads', 'resumes', path.basename(resumeUrl))); } catch { /* already removed */ }
     }
     return NextResponse.json({ message: 'Resume removed from profile' });

@@ -53,7 +53,7 @@ export async function PUT(request: Request) {
     }
 
     // Validate resume URL (must end with .pdf)
-    if (resumeUrl && !resumeUrl.toLowerCase().endsWith('.pdf')) {
+    if (resumeUrl && !resumeUrl.toLowerCase().endsWith('.pdf') && !resumeUrl.startsWith('/api/resumes/')) {
       return NextResponse.json({ error: 'Resume must be a PDF file' }, { status: 400 });
     }
 

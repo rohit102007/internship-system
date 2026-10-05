@@ -25,7 +25,7 @@ export async function POST(request: Request) {
 
     const body = await request.json();
     const { internshipId, resumeUrl, coverLetter, qualifications } = body;
-    if (!internshipId || !resumeUrl || typeof resumeUrl !== 'string' || !resumeUrl.toLowerCase().endsWith('.pdf')) {
+    if (!internshipId || !resumeUrl || typeof resumeUrl !== 'string' || (!resumeUrl.toLowerCase().endsWith('.pdf') && !resumeUrl.startsWith('/api/resumes/'))) {
       return NextResponse.json({ error: 'A PDF resume is required for every application' }, { status: 400 });
     }
 
