@@ -24,12 +24,21 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
 
     const { id } = await context.params;
     const body = await request.json();
-    const { name, phone, role } = body;
+    const { name, phone, role, isActive, status } = body;
 
-    const user = await prisma.user.update({
-      where: { id },
-      data: { name, phone, role: role?.toUpperCase() }
-    });
+    const data: any = {};
+    if (name !== undefined) data.name = name;
+    if (phone !== undefined) data.phone = phone;
+    if (role !== undefined) data.role = role.toUpperCase();
+    if (isActive !== undefined) {
+      data.isActive = isActive;
+      data.status = isActive ? 'Active' : 'Inactive';
+      const studentProfile = await prisma.studentProfile.findUnique({ where: { userId: id } });
+      if (studentProfile) await prisma.studentProfile.update({ where: { userId: id }, data: { isActive } });
+    }
+    if (status !== undefined) data.status = status;
+
+    const user = await prisma.user.update({ where: { id }, data });
     return NextResponse.json(user);
   } catch (error) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -51,7 +60,7 @@ export async function DELETE(request: Request, context: { params: Promise<{ id: 
     }
 
     // We don't hard-delete, we just mark inactive
-    await prisma.user.update({ where: { id }, data: { isActive: false } });
+    await prisma.user.update({ where: { id }, data: { isActive: false, status: 'Inactive' } });
     return NextResponse.json({ message: 'User deactivated' });
   } catch (error) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

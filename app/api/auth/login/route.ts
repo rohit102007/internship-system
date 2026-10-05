@@ -24,6 +24,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
     }
 
+    if (user.isActive === false || user.status === 'Inactive') {
+      return NextResponse.json({ error: 'This account has been deactivated. Contact an administrator for assistance.' }, { status: 403 });
+    }
+
     if (user.role === 'STUDENT') {
       const profile = await prisma.studentProfile.findUnique({ where: { userId: user.id } });
       if (!profile?.isActive) {

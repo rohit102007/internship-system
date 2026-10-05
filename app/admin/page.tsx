@@ -81,6 +81,18 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const activateUser = async (userId: string) => {
+    if (!confirm('Activate this user again?')) return;
+    const res = await fetch('/api/admin/users/' + userId, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ isActive: true }) });
+    if (res.ok) {
+      alert('User activated');
+      const usersRes = await fetch('/api/admin/users');
+      setUsers(await usersRes.json());
+    } else {
+      alert('Failed to activate user');
+    }
+  };
+
   const deleteUser = async (userId: string) => {
     if (!confirm('Delete this user? The account will be deactivated but kept in the database.')) return;
     const res = await fetch('/api/admin/users/' + userId, { method: 'DELETE' });
@@ -349,15 +361,19 @@ export default function AdminDashboardPage() {
                         <span style={{ padding: '0.2rem 0.5rem', borderRadius: '12px', fontSize: '0.75rem', fontWeight: 600, background: 'var(--primary-light)', color: 'var(--primary)' }}>{user.role}</span>
                       </td>
                       <td>
-                        <span style={{ color: user.isActive === false || user.studentProfile?.isActive === false ? 'var(--danger)' : 'var(--accent)', fontWeight: 500, fontSize: '0.875rem' }}>
-                          {user.isActive === false || user.studentProfile?.isActive === false ? 'Inactive' : 'Active'}
+                        <span style={{ color: user.isActive === false || user.status === 'Inactive' || user.studentProfile?.isActive === false ? 'var(--danger)' : 'var(--accent)', fontWeight: 500, fontSize: '0.875rem' }}>
+                          {user.isActive === false || user.status === 'Inactive' || user.studentProfile?.isActive === false ? 'Inactive' : 'Active'}
                         </span>
                       </td>
                       <td style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>{new Date(user.createdAt).toLocaleDateString()}</td>
                       <td>
                         <div style={{ display: 'flex', gap: '0.4rem' }}>
                           <button onClick={() => setEditingUser(user)} className="btn btn-outline" style={{ padding: '0.25rem 0.5rem', fontSize: '0.78rem' }}>Edit</button>
-                          <button onClick={() => deactivateUser(user.id)} className="btn btn-outline" style={{ padding: '0.25rem 0.5rem', fontSize: '0.78rem', borderColor: 'var(--danger)', color: 'var(--danger)' }}>Deactivate</button>
+                          {user.isActive === false || user.status === 'Inactive' ? (
+                            <button onClick={() => activateUser(user.id)} className="btn btn-outline" style={{ padding: '0.25rem 0.5rem', fontSize: '0.78rem', borderColor: 'var(--accent)', color: 'var(--accent)' }}>Activate</button>
+                          ) : (
+                            <button onClick={() => deactivateUser(user.id)} className="btn btn-outline" style={{ padding: '0.25rem 0.5rem', fontSize: '0.78rem', borderColor: 'var(--danger)', color: 'var(--danger)' }}>Deactivate</button>
+                          )}
                           <button onClick={() => deleteUser(user.id)} className="btn btn-outline" style={{ padding: '0.25rem 0.5rem', fontSize: '0.78rem', borderColor: 'var(--danger)', color: 'white', background: 'var(--danger)' }}>Delete</button>
                         </div>
                       </td>
