@@ -57,7 +57,7 @@ export async function PUT(request: Request) {
   }
 }
 
-// DELETE - permanently delete an internship
+// DELETE - soft delete: retain the internship and its related records for audit/history
 export async function DELETE(request: Request) {
   try {
     const admin = await getAdmin();
@@ -66,13 +66,8 @@ export async function DELETE(request: Request) {
     const { internshipId } = await request.json();
     if (!internshipId) return NextResponse.json({ error: 'internshipId required' }, { status: 400 });
 
-    const applications = await prisma.application.findMany({ where: { internshipId: internshipId }, select: { id: true } });
-    const appIds = applications.map(a => a.id);
-    await prisma.interview.deleteMany({ where: { applicationId: { in: appIds } } });
-    await prisma.application.deleteMany({ where: { internshipId: internshipId } });
-    await prisma.evaluation.deleteMany({ where: { internshipId: internshipId } });
-    await prisma.internship.delete({ where: { id: internshipId } });
-    return NextResponse.json({ success: true });
+    const internship = await prisma.internship.update({ where: { id: internshipId }, data: { status: 'ARCHIVED' } });
+    return NextResponse.json({ success: true, message: 'Internship archived. Its applications, interviews, and evaluations were retained.', internship });
   } catch (error) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }

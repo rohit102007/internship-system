@@ -8,7 +8,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'supersecret_fallback_key';
 async function admin() { const token = (await cookies()).get('auth_token')?.value; try { return !!token && (jwt.verify(token, JWT_SECRET) as { role: string }).role === 'ADMIN'; } catch { return false; } }
 export async function GET(_: Request, context: { params: Promise<{ id: string }> }) {
   const id = (await context.params).id;
-  const company = await prisma.company.findUnique({ where: { id }, include: { internships: true } });
+  const company = await prisma.company.findFirst({ where: { id, isActive: true }, include: { internships: { where: { status: 'OPEN' } } } });
   if (!company) return NextResponse.json({ error: 'Company not found' }, { status: 404 });
   const feedback = await prisma.feedback.findMany({ where: { type: 'STUDENT_ON_COMPANY', rating: { not: null } }, select: { rating: true, comments: true } });
   const ratings = feedback.filter(item => item.comments.startsWith(`[company:${id}]`)).map(item => item.rating as number);
