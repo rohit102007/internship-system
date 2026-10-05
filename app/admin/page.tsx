@@ -124,6 +124,16 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const deleteCompany = async (companyId: string) => {
+    if (!confirm('Delete this company? It will be hidden from the system but kept in the database.')) return;
+    const res = await fetch('/api/companies/' + companyId, { method: 'DELETE' });
+    if (res.ok) {
+      setCompanies(prev => prev.filter(c => c.id !== companyId));
+    } else {
+      alert('Failed to delete company');
+    }
+  };
+
   const updateInternshipStatus = async (internshipId: string, status: string) => {
     const res = await fetch('/api/admin/internships', {
       method: 'PUT', headers: { 'Content-Type': 'application/json' },
@@ -476,6 +486,7 @@ export default function AdminDashboardPage() {
                         <div style={{ display: 'flex', gap: '0.4rem' }}>
                           <button onClick={() => setEditingCompany(c)} className="btn btn-outline" style={{ padding: '0.25rem 0.5rem', fontSize: '0.78rem' }}>Edit</button>
                           <button onClick={() => archiveCompany(c.id)} className="btn btn-outline" style={{ padding: '0.25rem 0.5rem', fontSize: '0.78rem', borderColor: 'var(--danger)', color: 'var(--danger)' }}>Archive</button>
+                          <button onClick={() => deleteCompany(c.id)} className="btn btn-outline" style={{ padding: '0.25rem 0.5rem', fontSize: '0.78rem', borderColor: 'var(--danger)', color: 'white', background: 'var(--danger)' }}>Delete</button>
                         </div>
                       </td>
                     </tr>
