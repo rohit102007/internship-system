@@ -67,7 +67,6 @@ export default function LoginPage() {
                 required
               />
             </div>
-            <div style={{ textAlign: 'right', marginTop: '-0.5rem', marginBottom: '1.25rem' }}><Link href="/forgot-password" style={{ color: 'var(--primary)', fontSize: '0.9rem' }}>Forgot password?</Link></div>
             <div className="input-group">
               <label className="input-label required-label">Password</label>
               <input 
@@ -79,6 +78,7 @@ export default function LoginPage() {
                 required 
               />
             </div>
+            <div style={{ textAlign: 'right', marginTop: '-0.5rem', marginBottom: '1.25rem' }}><Link href="/forgot-password" style={{ color: 'var(--primary)', fontSize: '0.9rem' }}>Forgot password?</Link></div>
             <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '0.75rem' }} disabled={loading}>
               {loading ? 'Signing in...' : 'Sign in'}
             </button>
