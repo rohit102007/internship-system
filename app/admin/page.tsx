@@ -253,16 +253,6 @@ export default function AdminDashboardPage() {
             )}
           </div>
 
-          {/* System Health */}
-          <div className="card" style={{ gridColumn: 'span 2', padding: '1.25rem' }}>
-            <h3 style={{ margin: '0 0 0.85rem 0', fontSize: '1rem' }}>System Health & Activity</h3>
-            <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
-              <div><p style={{ color: 'var(--text-muted)', fontSize: '0.82rem', margin: '0 0 0.2rem 0' }}>Interviews</p><strong>{reports.systemOverview.totalInterviews} total / {reports.systemOverview.completedInterviews} completed</strong></div>
-              <div><p style={{ color: 'var(--text-muted)', fontSize: '0.82rem', margin: '0 0 0.2rem 0' }}>Evaluations</p><strong>{reports.systemOverview.totalEvaluations}</strong></div>
-              <div><p style={{ color: 'var(--text-muted)', fontSize: '0.82rem', margin: '0 0 0.2rem 0' }}>Feedback Items</p><strong>{reports.systemOverview.totalFeedback}</strong></div>
-              <div><p style={{ color: 'var(--text-muted)', fontSize: '0.82rem', margin: '0 0 0.2rem 0' }}>Registrations (7d)</p><strong>{reports.systemOverview.recentRegistrations}</strong></div>
-            </div>
-          </div>
         </div>
       )}
 

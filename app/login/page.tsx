@@ -67,6 +67,7 @@ export default function LoginPage() {
                 required
               />
             </div>
+            <div style={{ textAlign: 'right', marginTop: '-0.5rem', marginBottom: '1.25rem' }}><Link href="/forgot-password" style={{ color: 'var(--primary)', fontSize: '0.9rem' }}>Forgot password?</Link></div>
             <div className="input-group">
               <label className="input-label required-label">Password</label>
               <input 
