@@ -53,6 +53,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'You have already applied for this internship.' }, { status: 409 });
     }
 
+    const acceptedElsewhere = await prisma.application.findFirst({ where: { studentId: studentProfile.id, status: 'accepted' } });
+    if (acceptedElsewhere) {
+      return NextResponse.json({ error: 'You are already accepted for an internship, so you cannot apply for more.' }, { status: 409 });
+    }
+
     const application = await prisma.application.create({
       data: {
         studentId: studentProfile.id,

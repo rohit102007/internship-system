@@ -55,6 +55,25 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
 
     const ownedApplication = await prisma.application.findFirst({ where: { id, internship: { facultyId: (await prisma.facultyProfile.findUnique({ where: { userId: user.id } }))?.id } } });
     if (!ownedApplication) return NextResponse.json({ error: 'Application not found' }, { status: 404 });
+
+    if (status === 'accepted') {
+      // A student can only be accepted for one internship
+      const alreadyAccepted = await prisma.application.findFirst({
+        where: { studentId: ownedApplication.studentId, status: 'accepted', id: { not: ownedApplication.id } }
+      });
+      if (alreadyAccepted) {
+        return NextResponse.json({ error: 'This student is already accepted for another internship. Only one acceptance is allowed.' }, { status: 409 });
+      }
+
+      const application = await prisma.application.update({ where: { id }, data: { status } });
+      // Auto-close the student's other open applications
+      await prisma.application.updateMany({
+        where: { studentId: ownedApplication.studentId, id: { not: ownedApplication.id }, status: { in: ['pending', 'shortlisted'] } },
+        data: { status: 'rejected' }
+      });
+      return NextResponse.json(application);
+    }
+
     const application = await prisma.application.update({
       where: { id },
       data: { status }
