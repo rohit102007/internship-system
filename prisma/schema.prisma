@@ -15,6 +15,7 @@ model User {
   role      String   // ADMIN, FACULTY, STUDENT
   name      String
   phone     String?
+  isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

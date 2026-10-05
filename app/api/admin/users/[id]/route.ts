@@ -51,6 +51,7 @@ export async function DELETE(request: Request, context: { params: Promise<{ id: 
     }
 
     // We don't hard-delete, we just mark inactive
+    await prisma.user.update({ where: { id }, data: { isActive: false } });
     return NextResponse.json({ message: 'User deactivated' });
   } catch (error) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

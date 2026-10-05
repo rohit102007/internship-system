@@ -349,8 +349,8 @@ export default function AdminDashboardPage() {
                         <span style={{ padding: '0.2rem 0.5rem', borderRadius: '12px', fontSize: '0.75rem', fontWeight: 600, background: 'var(--primary-light)', color: 'var(--primary)' }}>{user.role}</span>
                       </td>
                       <td>
-                        <span style={{ color: user.studentProfile?.isActive === false ? 'var(--danger)' : 'var(--accent)', fontWeight: 500, fontSize: '0.875rem' }}>
-                          {user.studentProfile?.isActive === false ? 'Inactive' : 'Active'}
+                        <span style={{ color: user.isActive === false || user.studentProfile?.isActive === false ? 'var(--danger)' : 'var(--accent)', fontWeight: 500, fontSize: '0.875rem' }}>
+                          {user.isActive === false || user.studentProfile?.isActive === false ? 'Inactive' : 'Active'}
                         </span>
                       </td>
                       <td style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>{new Date(user.createdAt).toLocaleDateString()}</td>
