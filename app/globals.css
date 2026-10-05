@@ -129,6 +129,12 @@ a:hover {
   letter-spacing: 0.01em;
 }
 
+.required-label::after {
+  content: ' *';
+  color: var(--danger);
+  font-weight: 700;
+}
+
 .input-field {
   width: 100%;
   padding: 0.7rem 0.9rem;

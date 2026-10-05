@@ -82,23 +82,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Faculty profile not found' }, { status: 404 });
     }
 
-    let actualCompanyId = companyId;
-    if (!actualCompanyId || actualCompanyId === 'dummy-company-id') {
-      const firstCompany = await prisma.company.findFirst();
-      if (firstCompany) {
-        actualCompanyId = firstCompany.id;
-      } else {
-        const newCompany = await prisma.company.create({
-          data: {
-            name: "Default Tech Company",
-            registrationNumber: "REG-" + Date.now(),
-            location: "San Francisco",
-            contactPerson: "Jane Doe"
-          }
-        });
-        actualCompanyId = newCompany.id;
-      }
-    }
+    if (!companyId) return NextResponse.json({ error: 'Please select a company for this internship' }, { status: 400 });
+    const company = await prisma.company.findFirst({ where: { id: companyId, isActive: true } });
+    if (!company) return NextResponse.json({ error: 'Selected company is not available' }, { status: 400 });
 
     const internship = await prisma.internship.create({
       data: {
@@ -111,7 +97,7 @@ export async function POST(request: Request) {
         endDate: end,
         applicationDeadline: deadline,
         status: 'PENDING',
-        companyId: actualCompanyId,
+        companyId,
         facultyId: facultyProfile.id
       }
     });

@@ -130,7 +130,7 @@ export default function StudentProfilePage() {
         {isEditing ? (
           <form onSubmit={handleSave}>
             <div className="input-group">
-              <label className="input-label">Full Name</label>
+              <label className="input-label required-label">Full Name</label>
               <input className="input-field" value={form.name} onChange={e => setForm({...form, name: e.target.value})} required />
             </div>
             <div className="input-group">

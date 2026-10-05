@@ -21,7 +21,7 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
     }
     const { id } = await context.params;
     const body = await request.json();
-    const { title, description, domain, duration, stipend, startDate, endDate, applicationDeadline } = body;
+    const { title, description, domain, duration, stipend, startDate, endDate, applicationDeadline, companyId } = body;
 
     const updateData: any = {};
     if (title) updateData.title = title;
@@ -36,6 +36,11 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
     if (startDate) updateData.startDate = new Date(startDate);
     if (endDate) updateData.endDate = new Date(endDate);
     if (applicationDeadline) updateData.applicationDeadline = new Date(applicationDeadline);
+    if (companyId) {
+      const company = await prisma.company.findFirst({ where: { id: companyId, isActive: true } });
+      if (!company) return NextResponse.json({ error: 'Selected company is not available' }, { status: 400 });
+      updateData.companyId = companyId;
+    }
 
     const internship = await prisma.internship.update({ where: { id }, data: updateData });
     return NextResponse.json(internship);

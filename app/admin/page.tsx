@@ -21,6 +21,7 @@ export default function AdminDashboardPage() {
   const [showCreateCompany, setShowCreateCompany] = useState(false);
   const [newCompany, setNewCompany] = useState({ name: '', registrationNumber: '', location: '', contactPerson: '', contactEmail: '', contactPhone: '' });
   const [editingCompany, setEditingCompany] = useState<any>(null);
+  const [selectedInternship, setSelectedInternship] = useState<any>(null);
 
   useEffect(() => {
     Promise.all([
@@ -278,12 +279,12 @@ export default function AdminDashboardPage() {
             <div className="card" style={{ marginBottom: '1.5rem', padding: '1.5rem' }}>
               <h3 style={{ margin: '0 0 1rem 0' }}>Create New User</h3>
               <form onSubmit={createUser} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
-                <div className="input-group"><label className="input-label">Name</label><input className="input-field" value={newUser.name} onChange={e => setNewUser({...newUser, name: e.target.value})} required /></div>
-                <div className="input-group"><label className="input-label">Email</label><input type="email" className="input-field" value={newUser.email} onChange={e => setNewUser({...newUser, email: e.target.value})} required /></div>
-                <div className="input-group"><label className="input-label">Password</label><input type="password" className="input-field" value={newUser.password} onChange={e => setNewUser({...newUser, password: e.target.value})} required /></div>
+                <div className="input-group"><label className="input-label required-label">Name</label><input className="input-field" value={newUser.name} onChange={e => setNewUser({...newUser, name: e.target.value})} required /></div>
+                <div className="input-group"><label className="input-label required-label">Email</label><input type="email" className="input-field" value={newUser.email} onChange={e => setNewUser({...newUser, email: e.target.value})} required /></div>
+                <div className="input-group"><label className="input-label required-label">Password</label><input type="password" className="input-field" value={newUser.password} onChange={e => setNewUser({...newUser, password: e.target.value})} required /></div>
                 <div className="input-group"><label className="input-label">Phone</label><input className="input-field" value={newUser.phone} onChange={e => setNewUser({...newUser, phone: e.target.value})} /></div>
                 <div className="input-group">
-                  <label className="input-label">Role</label>
+                  <label className="input-label required-label">Role</label>
                   <select className="input-field" value={newUser.role} onChange={e => setNewUser({...newUser, role: e.target.value})}>
                     <option value="STUDENT">Student</option><option value="FACULTY">Faculty</option><option value="ADMIN">Admin</option><option value="COMPANY">Company</option>
                   </select>
@@ -358,6 +359,15 @@ export default function AdminDashboardPage() {
 
       {/* ============ INTERNSHIPS TAB ============ */}
       {activeTab === 'internships' && (
+        <div>
+          {selectedInternship && <div className="card" style={{ marginBottom: '1rem', padding: '1.5rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', alignItems: 'flex-start' }}><div><h2 style={{ margin: 0 }}>{selectedInternship.title}</h2><p className="text-muted" style={{ margin: '.35rem 0' }}>{selectedInternship.company?.name} · Posted by {selectedInternship.faculty?.user?.name}</p></div><button className="btn btn-outline" onClick={() => setSelectedInternship(null)}>Close</button></div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: '1rem', marginTop: '1rem' }}>
+              <div><strong>Domain</strong><p>{selectedInternship.domain}</p></div><div><strong>Status</strong><p>{selectedInternship.status}</p></div><div><strong>Duration</strong><p>{selectedInternship.duration} weeks</p></div><div><strong>Stipend</strong><p>${selectedInternship.stipend}</p></div><div><strong>Applications</strong><p>{selectedInternship.applications?.length || 0}</p></div><div><strong>Deadline</strong><p>{new Date(selectedInternship.applicationDeadline).toLocaleDateString()}</p></div><div><strong>Start date</strong><p>{new Date(selectedInternship.startDate).toLocaleDateString()}</p></div><div><strong>End date</strong><p>{new Date(selectedInternship.endDate).toLocaleDateString()}</p></div>
+            </div>
+            <div style={{ marginTop: '1rem' }}><strong>Description</strong><p style={{ whiteSpace: 'pre-wrap' }}>{selectedInternship.description}</p></div>
+            <div style={{ marginTop: '1rem' }}><strong>Company contact</strong><p>{selectedInternship.company?.contactPerson} · {selectedInternship.company?.contactEmail || 'No email'} · {selectedInternship.company?.contactPhone || 'No phone'}</p></div>
+          </div>}
         <div className="card" style={{ overflow: 'hidden', padding: 0 }}>
           <div style={{ overflowX: 'auto' }}>
             <table>
@@ -394,6 +404,7 @@ export default function AdminDashboardPage() {
                           <button onClick={() => updateInternshipStatus(i.id, 'REJECTED')} className="btn btn-outline" style={{ padding: '0.25rem 0.5rem', fontSize: '0.78rem', color: 'var(--danger)', borderColor: 'var(--danger)' }}>Reject</button>
                         )}
                         {!['ARCHIVED', 'PENDING'].includes(i.status) && <button onClick={() => updateInternshipStatus(i.id, 'ARCHIVED')} className="btn btn-outline" style={{ padding: '0.25rem 0.5rem', fontSize: '0.78rem' }}>Archive</button>}
+                        <button onClick={() => setSelectedInternship(i)} className="btn btn-outline" style={{ padding: '0.25rem 0.5rem', fontSize: '0.78rem' }}>Details</button>
                         <button onClick={() => deleteInternship(i.id)} className="btn btn-outline" style={{ padding: '0.25rem 0.5rem', fontSize: '0.78rem', borderColor: 'var(--danger)', color: 'var(--danger)' }}>Delete</button>
                       </div>
                     </td>
@@ -402,6 +413,7 @@ export default function AdminDashboardPage() {
               </tbody>
             </table>
           </div>
+        </div>
         </div>
       )}
 
@@ -418,10 +430,10 @@ export default function AdminDashboardPage() {
             <div className="card" style={{ marginBottom: '1.5rem', padding: '1.5rem' }}>
               <h3 style={{ margin: '0 0 1rem 0' }}>Add New Company</h3>
               <form onSubmit={createCompany} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
-                <div className="input-group"><label className="input-label">Company Name</label><input className="input-field" value={newCompany.name} onChange={e => setNewCompany({...newCompany, name: e.target.value})} required /></div>
-                <div className="input-group"><label className="input-label">Registration Number</label><input className="input-field" value={newCompany.registrationNumber} onChange={e => setNewCompany({...newCompany, registrationNumber: e.target.value})} required /></div>
-                <div className="input-group"><label className="input-label">Location</label><input className="input-field" value={newCompany.location} onChange={e => setNewCompany({...newCompany, location: e.target.value})} required /></div>
-                <div className="input-group"><label className="input-label">Contact Person</label><input className="input-field" value={newCompany.contactPerson} onChange={e => setNewCompany({...newCompany, contactPerson: e.target.value})} required /></div>
+                <div className="input-group"><label className="input-label required-label">Company Name</label><input className="input-field" value={newCompany.name} onChange={e => setNewCompany({...newCompany, name: e.target.value})} required /></div>
+                <div className="input-group"><label className="input-label required-label">Registration Number</label><input className="input-field" value={newCompany.registrationNumber} onChange={e => setNewCompany({...newCompany, registrationNumber: e.target.value})} required /></div>
+                <div className="input-group"><label className="input-label required-label">Location</label><input className="input-field" value={newCompany.location} onChange={e => setNewCompany({...newCompany, location: e.target.value})} required /></div>
+                <div className="input-group"><label className="input-label required-label">Contact Person</label><input className="input-field" value={newCompany.contactPerson} onChange={e => setNewCompany({...newCompany, contactPerson: e.target.value})} required /></div>
                 <div className="input-group"><label className="input-label">Contact Email</label><input type="email" className="input-field" value={newCompany.contactEmail} onChange={e => setNewCompany({...newCompany, contactEmail: e.target.value})} /></div>
                 <div className="input-group"><label className="input-label">Contact Phone</label><input className="input-field" value={newCompany.contactPhone} onChange={e => setNewCompany({...newCompany, contactPhone: e.target.value})} /></div>
                 <button type="submit" className="btn btn-primary" style={{ gridColumn: '1 / -1' }}>Create Company</button>

@@ -111,17 +111,17 @@ function RegisterForm() {
 
         <form onSubmit={handleRegister}>
           <div className="input-group">
-            <label className="input-label">{role === 'company' ? 'Company Name' : 'Full Name'}</label>
+            <label className="input-label required-label">{role === 'company' ? 'Company Name' : 'Full Name'}</label>
             <input type="text" className="input-field" value={name} onChange={e => setName(e.target.value)} placeholder={role === 'company' ? 'Acme Corp' : 'John Doe'} required />
           </div>
           
           <div className="input-group">
-            <label className="input-label">Email address</label>
+            <label className="input-label required-label">Email address</label>
             <input type="email" className="input-field" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" required />
           </div>
 
           <div className="input-group">
-            <label className="input-label">Password</label>
+            <label className="input-label required-label">Password</label>
             <input type="password" className="input-field" value={password} onChange={e => setPassword(e.target.value)} required 
                    pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$" 
                    title="Min 8 chars, 1 uppercase, 1 lowercase, 1 number, 1 special character"
@@ -129,26 +129,26 @@ function RegisterForm() {
           </div>
 
           <div className="input-group">
-            <label className="input-label">Phone number <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>(optional)</span></label>
-            <input type="tel" className="input-field" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+1 (555) 000-0000" />
+            <label className="input-label required-label">Phone number</label>
+            <input type="tel" className="input-field" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+1 (555) 000-0000" required />
           </div>
 
           {role === 'student' && (
             <div style={{ display: 'flex', gap: '0.75rem' }}>
               <div className="input-group" style={{ flex: 1 }}>
-                <label className="input-label">Department</label>
+                <label className="input-label required-label">Department</label>
                 <input type="text" className="input-field" value={department} onChange={e => setDepartment(e.target.value)} placeholder="Computer Science" required />
               </div>
               <div className="input-group" style={{ flex: 1 }}>
-                <label className="input-label">GPA (0.0 – 4.0)</label>
-                <input type="number" step="0.1" min="0" max="4" className="input-field" value={gpa} onChange={e => setGpa(e.target.value)} placeholder="3.5" />
+                <label className="input-label required-label">GPA (0.0 – 4.0)</label>
+                <input type="number" step="0.1" min="0" max="4" className="input-field" value={gpa} onChange={e => setGpa(e.target.value)} placeholder="3.5" required />
               </div>
             </div>
           )}
 
           {role === 'faculty' && (
             <div className="input-group">
-              <label className="input-label">Department</label>
+              <label className="input-label required-label">Department</label>
               <input type="text" className="input-field" value={department} onChange={e => setDepartment(e.target.value)} placeholder="Computer Science" required />
             </div>
           )}

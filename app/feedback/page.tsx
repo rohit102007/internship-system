@@ -48,7 +48,7 @@ export default function StudentFeedbackPage() {
       <div className="card" style={{ padding: '1.75rem' }}>
         <form onSubmit={handleSubmit}>
           <div className="input-group">
-            <label className="input-label">Feedback Type</label>
+            <label className="input-label required-label">Feedback Type</label>
             <select className="input-field" value={type} onChange={e => setType(e.target.value)}>
               <option value="STUDENT_ON_COMPANY">Rate Company / Internship Experience</option>
               <option value="SYSTEM">Platform Suggestion / Bug Report</option>
@@ -58,7 +58,7 @@ export default function StudentFeedbackPage() {
           {type === 'STUDENT_ON_COMPANY' && (
             <>
               <div className="input-group">
-                <label className="input-label">Company</label>
+                <label className="input-label required-label">Company</label>
                 <select className="input-field" value={companyId} onChange={e => setCompanyId(e.target.value)} required>
                   <option value="">Select the company</option>
                   {companies.map(company => <option key={company.id} value={company.id}>{company.name}</option>)}
@@ -80,7 +80,7 @@ export default function StudentFeedbackPage() {
           )}
 
           <div className="input-group">
-            <label className="input-label">Overall Rating</label>
+            <label className="input-label required-label">Overall Rating</label>
             <div style={{ display: 'flex', gap: '0.35rem', fontSize: '1.75rem' }}>
               {[1, 2, 3, 4, 5].map(star => (
                 <span
@@ -95,7 +95,7 @@ export default function StudentFeedbackPage() {
           </div>
 
           <div className="input-group">
-            <label className="input-label">Detailed Comments</label>
+            <label className="input-label required-label">Detailed Comments</label>
             <textarea className="input-field" rows={5} value={comments} onChange={e => setComments(e.target.value)} 
               placeholder={type === 'SYSTEM' ? "Describe the feature suggestion or bug you'd like to report..." : "Share your detailed experience including strengths and areas for improvement..."} required />
           </div>

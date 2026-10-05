@@ -57,7 +57,7 @@ export default function LoginPage() {
           )}
           <form onSubmit={handleLogin}>
             <div className="input-group">
-              <label className="input-label">Email address</label>
+              <label className="input-label required-label">Email address</label>
               <input 
                 type="email" 
                 className="input-field" 
@@ -68,7 +68,7 @@ export default function LoginPage() {
               />
             </div>
             <div className="input-group">
-              <label className="input-label">Password</label>
+              <label className="input-label required-label">Password</label>
               <input 
                 type="password" 
                 className="input-field"

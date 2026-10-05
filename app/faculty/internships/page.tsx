@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 
 export default function ManageInternshipsPage() {
   const [internships, setInternships] = useState<any[]>([]);
+  const [companies, setCompanies] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Form State
@@ -15,6 +16,7 @@ export default function ManageInternshipsPage() {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [applicationDeadline, setApplicationDeadline] = useState('');
+  const [companyId, setCompanyId] = useState('');
 
   // Edit state
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -28,7 +30,10 @@ export default function ManageInternshipsPage() {
     setLoading(false);
   };
 
-  useEffect(() => { fetchInternships(); }, []);
+  useEffect(() => {
+    fetchInternships();
+    fetch('/api/companies').then(res => res.json()).then(data => setCompanies(Array.isArray(data) ? data : []));
+  }, []);
 
   const handlePost = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +41,7 @@ export default function ManageInternshipsPage() {
       const res = await fetch('/api/internships', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, description, domain, duration, stipend, startDate, endDate, applicationDeadline })
+        body: JSON.stringify({ title, description, domain, duration, stipend, startDate, endDate, applicationDeadline, companyId })
       });
       const data = await res.json();
       if (!res.ok) { alert(data.error); return; }
@@ -53,7 +58,7 @@ export default function ManageInternshipsPage() {
       const res = await fetch('/api/internships/' + editingId, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, description, domain, duration, stipend, startDate, endDate, applicationDeadline })
+        body: JSON.stringify({ title, description, domain, duration, stipend, startDate, endDate, applicationDeadline, companyId })
       });
       const data = await res.json();
       if (!res.ok) { alert(data.error); return; }
@@ -74,12 +79,13 @@ export default function ManageInternshipsPage() {
     setStartDate(new Date(i.startDate).toISOString().split('T')[0]);
     setEndDate(new Date(i.endDate).toISOString().split('T')[0]);
     setApplicationDeadline(new Date(i.applicationDeadline).toISOString().split('T')[0]);
+    setCompanyId(i.companyId);
     setShowForm(false);
   };
 
   const resetForm = () => {
     setTitle(''); setDescription(''); setDomain(''); setDuration('');
-    setStipend(''); setStartDate(''); setEndDate(''); setApplicationDeadline('');
+    setStipend(''); setStartDate(''); setEndDate(''); setApplicationDeadline(''); setCompanyId('');
   };
 
   const deleteInternship = async (id: string) => {
@@ -105,35 +111,43 @@ export default function ManageInternshipsPage() {
           <h2>{editingId ? 'Edit Internship' : 'Post New Internship'}</h2>
           <form onSubmit={editingId ? handleEdit : handlePost} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
             <div className="input-group" style={{ gridColumn: '1 / -1' }}>
-              <label className="input-label">Title</label>
+              <label className="input-label required-label">Title</label>
               <input type="text" className="input-field" value={title} onChange={e => setTitle(e.target.value)} required />
             </div>
             <div className="input-group" style={{ gridColumn: '1 / -1' }}>
-              <label className="input-label">Description</label>
+              <label className="input-label required-label">Description</label>
               <textarea className="input-field" value={description} onChange={e => setDescription(e.target.value)} required rows={4} />
             </div>
+            <div className="input-group" style={{ gridColumn: '1 / -1' }}>
+              <label className="input-label required-label">Company</label>
+              <select className="input-field" value={companyId} onChange={e => setCompanyId(e.target.value)} required>
+                <option value="">Select the company for this internship</option>
+                {companies.map(company => <option key={company.id} value={company.id}>{company.name} — {company.location}</option>)}
+              </select>
+              {companies.length === 0 && <p className="text-muted" style={{ marginTop: '.4rem', fontSize: '.85rem' }}>No active companies exist. Ask an administrator to add one first.</p>}
+            </div>
             <div className="input-group">
-              <label className="input-label">Domain</label>
+              <label className="input-label required-label">Domain</label>
               <input type="text" className="input-field" value={domain} onChange={e => setDomain(e.target.value)} required placeholder="e.g. Software Engineering" />
             </div>
             <div className="input-group">
-              <label className="input-label">Duration (Weeks, 4-24)</label>
+              <label className="input-label required-label">Duration (Weeks, 4-24)</label>
               <input type="number" min="4" max="24" className="input-field" value={duration} onChange={e => setDuration(e.target.value)} required />
             </div>
             <div className="input-group">
-              <label className="input-label">Stipend ($)</label>
+              <label className="input-label required-label">Stipend ($)</label>
               <input type="number" className="input-field" value={stipend} onChange={e => setStipend(e.target.value)} required />
             </div>
             <div className="input-group">
-              <label className="input-label">Application Deadline</label>
+              <label className="input-label required-label">Application Deadline</label>
               <input type="date" className="input-field" value={applicationDeadline} onChange={e => setApplicationDeadline(e.target.value)} required />
             </div>
             <div className="input-group">
-              <label className="input-label">Start Date</label>
+              <label className="input-label required-label">Start Date</label>
               <input type="date" className="input-field" value={startDate} onChange={e => setStartDate(e.target.value)} required />
             </div>
             <div className="input-group">
-              <label className="input-label">End Date</label>
+              <label className="input-label required-label">End Date</label>
               <input type="date" className="input-field" value={endDate} onChange={e => setEndDate(e.target.value)} required />
             </div>
             <div style={{ gridColumn: '1 / -1', display: 'flex', gap: '1rem' }}>

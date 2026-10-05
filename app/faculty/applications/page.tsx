@@ -101,15 +101,15 @@ export default function FacultyApplicationsPage() {
           <h3>Schedule Interview</h3>
           <form onSubmit={scheduleInterview} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
             <div className="input-group">
-              <label className="input-label">Date</label>
+              <label className="input-label required-label">Date</label>
               <input type="date" className="input-field" value={interviewDate} onChange={e => setInterviewDate(e.target.value)} required />
             </div>
             <div className="input-group">
-              <label className="input-label">Time</label>
+              <label className="input-label required-label">Time</label>
               <input type="time" className="input-field" value={interviewTime} onChange={e => setInterviewTime(e.target.value)} required />
             </div>
             <div className="input-group" style={{ gridColumn: '1 / -1' }}>
-              <label className="input-label">Interviewer Details</label>
+              <label className="input-label required-label">Interviewer Details</label>
               <input type="text" className="input-field" placeholder="Name, designation, department" value={interviewerDetails} onChange={e => setInterviewerDetails(e.target.value)} required />
             </div>
             <button type="submit" className="btn btn-primary">Schedule</button>
@@ -124,11 +124,11 @@ export default function FacultyApplicationsPage() {
           <h3>Evaluate Student: {evaluating.student?.user?.name}</h3>
           <form onSubmit={submitEvaluation} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
             <div className="input-group" style={{ gridColumn: '1 / -1' }}>
-              <label className="input-label">Evaluation Criteria</label>
+              <label className="input-label required-label">Evaluation Criteria</label>
               <textarea className="input-field" rows={3} placeholder="Technical skills, communication, problem solving..." value={criteria} onChange={e => setCriteria(e.target.value)} required />
             </div>
             <div className="input-group">
-              <label className="input-label">Score (1-5)</label>
+              <label className="input-label required-label">Score (1-5)</label>
               <input type="number" min="1" max="5" step="1" className="input-field" value={scoring} onChange={e => setScoring(e.target.value)} required />
             </div>
             <div className="input-group">
