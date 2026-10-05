@@ -73,11 +73,13 @@ export default function AdminDashboardPage() {
 
   const deactivateUser = async (userId: string) => {
     if (!confirm('Are you sure you want to deactivate this user?')) return;
-    const res = await fetch('/api/admin/users/' + userId, { method: 'DELETE' });
+    const res = await fetch('/api/admin/users/' + userId, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ isActive: false }) });
     if (res.ok) {
       alert('User deactivated');
       const usersRes = await fetch('/api/admin/users');
       setUsers(await usersRes.json());
+    } else {
+      alert('Failed to deactivate user');
     }
   };
 
@@ -94,10 +96,10 @@ export default function AdminDashboardPage() {
   };
 
   const deleteUser = async (userId: string) => {
-    if (!confirm('Delete this user? The account will be deactivated but kept in the database.')) return;
+    if (!confirm('Permanently delete this user? This cannot be undone.')) return;
     const res = await fetch('/api/admin/users/' + userId, { method: 'DELETE' });
     if (res.ok) {
-      alert('User deleted (deactivated, record kept)');
+      alert('User deleted');
       const usersRes = await fetch('/api/admin/users');
       setUsers(await usersRes.json());
     } else {

@@ -53,15 +53,31 @@ export async function DELETE(request: Request, context: { params: Promise<{ id: 
 
     const { id } = await context.params;
 
-    // Deactivate student profile if exists
+    // Remove dependent records so the user row can be fully deleted
     const studentProfile = await prisma.studentProfile.findUnique({ where: { userId: id } });
     if (studentProfile) {
-      await prisma.studentProfile.update({ where: { userId: id }, data: { isActive: false } });
+      const apps = await prisma.application.findMany({ where: { studentId: studentProfile.id }, select: { id: true } });
+      await prisma.interview.deleteMany({ where: { applicationId: { in: apps.map(a => a.id) } } });
+      await prisma.evaluation.deleteMany({ where: { studentId: studentProfile.id } });
+      await prisma.feedback.deleteMany({ where: { studentId: studentProfile.id } });
+      await prisma.application.deleteMany({ where: { studentId: studentProfile.id } });
+      await prisma.studentProfile.delete({ where: { id: studentProfile.id } });
     }
 
-    // We don't hard-delete, we just mark inactive
-    await prisma.user.update({ where: { id }, data: { isActive: false, status: 'Inactive' } });
-    return NextResponse.json({ message: 'User deactivated' });
+    const facultyProfile = await prisma.facultyProfile.findUnique({ where: { userId: id } });
+    if (facultyProfile) {
+      const internships = await prisma.internship.findMany({ where: { facultyId: facultyProfile.id }, select: { id: true } });
+      const ids = internships.map(i => i.id);
+      const apps = await prisma.application.findMany({ where: { internshipId: { in: ids } }, select: { id: true } });
+      await prisma.interview.deleteMany({ where: { applicationId: { in: apps.map(a => a.id) } } });
+      await prisma.evaluation.deleteMany({ where: { internshipId: { in: ids } } });
+      await prisma.application.deleteMany({ where: { internshipId: { in: ids } } });
+      await prisma.internship.deleteMany({ where: { facultyId: facultyProfile.id } });
+      await prisma.facultyProfile.delete({ where: { id: facultyProfile.id } });
+    }
+
+    await prisma.user.delete({ where: { id } });
+    return NextResponse.json({ message: 'User deleted' });
   } catch (error) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
