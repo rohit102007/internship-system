@@ -23,7 +23,7 @@ export async function GET(request: Request) {
     if (!admin) return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
 
     const users = await prisma.user.findMany({
-      select: { id: true, email: true, name: true, role: true, phone: true, createdAt: true,
+      select: { id: true, email: true, name: true, role: true, phone: true, createdAt: true, isActive: true, status: true,
         studentProfile: { select: { id: true, department: true, gpa: true, isActive: true } },
         facultyProfile: { select: { id: true, department: true } }
       },
