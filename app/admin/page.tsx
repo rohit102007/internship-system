@@ -81,6 +81,18 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const deleteUser = async (userId: string) => {
+    if (!confirm('Delete this user? The account will be deactivated but kept in the database.')) return;
+    const res = await fetch('/api/admin/users/' + userId, { method: 'DELETE' });
+    if (res.ok) {
+      alert('User deleted (deactivated, record kept)');
+      const usersRes = await fetch('/api/admin/users');
+      setUsers(await usersRes.json());
+    } else {
+      alert('Failed to delete user');
+    }
+  };
+
   const createCompany = async (e: React.FormEvent) => {
     e.preventDefault();
     const res = await fetch('/api/companies', {
@@ -346,6 +358,7 @@ export default function AdminDashboardPage() {
                         <div style={{ display: 'flex', gap: '0.4rem' }}>
                           <button onClick={() => setEditingUser(user)} className="btn btn-outline" style={{ padding: '0.25rem 0.5rem', fontSize: '0.78rem' }}>Edit</button>
                           <button onClick={() => deactivateUser(user.id)} className="btn btn-outline" style={{ padding: '0.25rem 0.5rem', fontSize: '0.78rem', borderColor: 'var(--danger)', color: 'var(--danger)' }}>Deactivate</button>
+                          <button onClick={() => deleteUser(user.id)} className="btn btn-outline" style={{ padding: '0.25rem 0.5rem', fontSize: '0.78rem', borderColor: 'var(--danger)', color: 'white', background: 'var(--danger)' }}>Delete</button>
                         </div>
                       </td>
                     </tr>
