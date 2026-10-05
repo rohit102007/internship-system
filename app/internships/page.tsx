@@ -20,6 +20,7 @@ export default function InternshipsPage() {
   const [coverLetter, setCoverLetter] = useState('');
   const [qualifications, setQualifications] = useState('');
   const [userRole, setUserRole] = useState<string | null | undefined>(undefined);
+  const [appliedIds, setAppliedIds] = useState<Set<string>>(new Set());
   const resumeInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -40,6 +41,16 @@ export default function InternshipsPage() {
       .then(data => setUserRole(data.user?.role ?? null))
       .catch(() => setUserRole(null));
   }, []);
+
+  useEffect(() => {
+    if (userRole !== 'STUDENT') return;
+    fetch('/api/applications')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) setAppliedIds(new Set(data.map((app: any) => app.internshipId)));
+      })
+      .catch(() => {});
+  }, [userRole]);
 
   useEffect(() => {
     let result = internships;
@@ -79,6 +90,7 @@ export default function InternshipsPage() {
       const data = await res.json();
       if (!res.ok) setApplicationError(data.error || 'Unable to submit application');
       else {
+        setAppliedIds(prev => new Set(prev).add(selectedInternshipId));
         setSelectedInternshipId(null);
         setResume(null);
         setCoverLetter('');
@@ -150,8 +162,8 @@ export default function InternshipsPage() {
                 <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>📅 {new Date(internship.applicationDeadline).toLocaleDateString()}</span>
               </div>
               
-              <button onClick={() => chooseInternship(internship.id)} className="btn btn-primary" style={{ width: '100%' }} disabled={userRole === undefined}>
-                {userRole === undefined ? 'Checking access…' : !userRole ? 'Login to apply' : userRole === 'STUDENT' ? 'Apply Now' : 'Student accounts only'}
+              <button onClick={() => chooseInternship(internship.id)} className="btn btn-primary" style={{ width: '100%' }} disabled={userRole === undefined || appliedIds.has(internship.id)}>
+                {appliedIds.has(internship.id) ? 'Applied ✓' : userRole === undefined ? 'Checking access…' : !userRole ? 'Login to apply' : userRole === 'STUDENT' ? 'Apply Now' : 'Student accounts only'}
               </button>
             </div>
           ))}
