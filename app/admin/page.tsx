@@ -398,6 +398,32 @@ export default function AdminDashboardPage() {
             </div>
             <div style={{ marginTop: '1rem' }}><strong>Description</strong><p style={{ whiteSpace: 'pre-wrap' }}>{selectedInternship.description}</p></div>
             <div style={{ marginTop: '1rem' }}><strong>Company contact</strong><p>{selectedInternship.company?.contactPerson} · {selectedInternship.company?.contactEmail || 'No email'} · {selectedInternship.company?.contactPhone || 'No phone'}</p></div>
+
+            <div style={{ marginTop: '1.25rem' }}>
+              <strong>Applicants</strong>
+              {selectedInternship.applications?.length ? (
+                <table style={{ width: '100%', marginTop: '0.5rem', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr style={{ textAlign: 'left', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                      <th style={{ padding: '0.35rem 0.5rem' }}>Student</th>
+                      <th style={{ padding: '0.35rem 0.5rem' }}>Email</th>
+                      <th style={{ padding: '0.35rem 0.5rem' }}>Applied on</th>
+                      <th style={{ padding: '0.35rem 0.5rem' }}>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {selectedInternship.applications.map((app: any) => (
+                      <tr key={app.id} style={{ borderTop: '1px solid var(--surface-border)' }}>
+                        <td style={{ padding: '0.4rem 0.5rem' }}>{app.student?.user?.name || '—'}</td>
+                        <td style={{ padding: '0.4rem 0.5rem', color: 'var(--text-muted)' }}>{app.student?.user?.email || '—'}</td>
+                        <td style={{ padding: '0.4rem 0.5rem', color: 'var(--text-muted)' }}>{new Date(app.createdAt).toLocaleDateString()}</td>
+                        <td style={{ padding: '0.4rem 0.5rem' }}>{app.status}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : <p style={{ color: 'var(--text-muted)' }}>No applications yet.</p>}
+            </div>
           </div>}
         <div className="card" style={{ overflow: 'hidden', padding: 0 }}>
           <div style={{ overflowX: 'auto' }}>

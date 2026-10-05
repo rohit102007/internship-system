@@ -26,7 +26,7 @@ export async function GET(request: Request) {
       include: {
         company: true,
         faculty: { include: { user: { select: { name: true } } } },
-        applications: { select: { id: true } }
+        applications: { select: { id: true, status: true, createdAt: true, student: { select: { user: { select: { name: true, email: true } } } } } }
       }
     });
     return NextResponse.json(internships);
