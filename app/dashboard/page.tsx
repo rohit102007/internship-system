@@ -1,6 +1,7 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import jwt from 'jsonwebtoken';
+import prisma from '@/lib/prisma';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecret_fallback_key';
 
@@ -18,6 +19,10 @@ export default async function DashboardPage() {
   } catch {
     redirect('/login');
   }
+
+  const dbUser = await prisma.user.findUnique({ where: { id: user.id }, select: { name: true, email: true, role: true } });
+  if (!dbUser) redirect('/login');
+  const displayName = dbUser.name;
 
   const cardStyle = {
     display: 'flex',
@@ -41,7 +46,7 @@ export default async function DashboardPage() {
   return (
     <div className="container animate-fade-in">
       <div style={{ marginBottom: '2rem' }}>
-        <h1 style={{ marginBottom: '0.25rem' }}>Welcome back, {user.email}</h1>
+        <h1 style={{ marginBottom: '0.25rem' }}>Welcome back, {displayName}</h1>
         <div style={{
           display: 'inline-flex',
           padding: '0.25rem 0.65rem',
