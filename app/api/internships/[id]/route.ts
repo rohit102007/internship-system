@@ -32,7 +32,11 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
       if (d < 4 || d > 24) return NextResponse.json({ error: 'Duration must be 4-24 weeks' }, { status: 400 });
       updateData.duration = d;
     }
-    if (stipend) updateData.stipend = parseFloat(stipend);
+    if (stipend !== undefined && stipend !== '') {
+      const s = parseFloat(stipend);
+      if (isNaN(s) || s < 0) return NextResponse.json({ error: 'Stipend cannot be negative' }, { status: 400 });
+      updateData.stipend = s;
+    }
     if (startDate) updateData.startDate = new Date(startDate);
     if (endDate) updateData.endDate = new Date(endDate);
     if (applicationDeadline) updateData.applicationDeadline = new Date(applicationDeadline);

@@ -77,6 +77,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Internship duration must be between 4 and 24 weeks' }, { status: 400 });
     }
 
+    // Validation for stipend
+    const stipendAmount = parseFloat(stipend);
+    if (isNaN(stipendAmount) || stipendAmount < 0) {
+      return NextResponse.json({ error: 'Stipend cannot be negative' }, { status: 400 });
+    }
+
     const facultyProfile = await prisma.facultyProfile.findUnique({ where: { userId: user.id } });
     if (!facultyProfile) {
       return NextResponse.json({ error: 'Faculty profile not found' }, { status: 404 });

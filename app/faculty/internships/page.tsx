@@ -136,7 +136,7 @@ export default function ManageInternshipsPage() {
             </div>
             <div className="input-group">
               <label className="input-label required-label">Stipend ($)</label>
-              <input type="number" className="input-field" value={stipend} onChange={e => setStipend(e.target.value)} required />
+              <input type="number" min="0" className="input-field" value={stipend} onChange={e => setStipend(e.target.value)} required />
             </div>
             <div className="input-group">
               <label className="input-label required-label">Application Deadline</label>
