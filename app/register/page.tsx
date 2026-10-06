@@ -1,12 +1,14 @@
 "use client";
-import { useState, Suspense } from 'react';
+import { useState, Suspense, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
 function RegisterForm() {
   const searchParams = useSearchParams();
   const defaultRole = searchParams.get('role') || 'student';
-  
+  const routerGuard = useRouter();
+  useEffect(() => { fetch('/api/auth/session').then(r => r.json()).then(d => { if (d.user) routerGuard.replace('/dashboard'); }).catch(() => {}); }, []);
+
   const [role, setRole] = useState(defaultRole);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
